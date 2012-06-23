@@ -1,0 +1,11 @@
+[general]
+xmlrpc_url=http://username:password@localhost:5555/RPC2
+
+[tv]
+target_paths=/mnt/disk1/tv/,/mnt/disk2/tv/
+source_paths=/mnt/downloads/tv/
+automove_syntax=%(show)s/Season.%(season)0.2i/
+
+[movies]
+target_paths=/mnt/disk1/movies/,/mnt/disk2/movies/
+source_paths=/mnt/downloads/movies/
