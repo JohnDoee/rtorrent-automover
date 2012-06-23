@@ -7,6 +7,7 @@ import logging
 import sys
 import re
 import time
+import subprocess
 
 from xmlrpclib import ServerProxy
 from operator import itemgetter
@@ -21,6 +22,8 @@ class Automover(object):
         self.automove_syntax = automove_syntax
 
     def scan(self):
+        moved_anything = False
+        
         logging.debug('Scanning section: %s' % self.name)
         for f in self.proxy.download_list():
             directory = self.proxy.d.directory(f)
@@ -63,6 +66,9 @@ class Automover(object):
 
             logging.debug('Moving %s to %s' % (name, destination))
             self.move_hash(f, destination)
+            moved_anything = True
+        
+        return moved_anything
 
     def cleanup_part(self, part):
         return part.replace('_', '').replace('.', '').replace(' ', '').lower()
@@ -140,6 +146,8 @@ def commandline_handler():
 
     xmlrpc_url = config.get('general', 'xmlrpc_url')
 
+    moved_something = False
+    
     for klass in [TVAutomover, MoviesAutomover]:
         section = klass.name
         if not config.has_section(section):
@@ -150,7 +158,12 @@ def commandline_handler():
                             config.get(section, 'source_paths').split(','),
                             config.get(section, 'target_paths').split(','),
                             automove_syntax)
-        automover.scan()
+        result = automover.scan()
+        if not moved_something:
+            moved_something = result
+    
+    if moved_something and config.has_option('general', 'execute_on_moved'):
+        subprocess.call(config.get('general', 'execute_on_moved'), shell=True)
 
 if __name__ == '__main__':
     commandline_handler()
