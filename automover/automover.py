@@ -100,9 +100,13 @@ class Automover(object):
 
     def move_hash(self, hash, destination):
         is_started = self.proxy.d.state(hash)
-        source = self.proxy.d.directory(hash)
+        if self.proxy.d.is_multi_file(hash):
+            source = self.proxy.d.directory(hash)
+        else:
+            source = os.path.join(self.proxy.d.directory(hash), self.proxy.d.name(hash))
+        
         destination_name = os.path.join(destination, self.proxy.d.name(hash))
-        if os.path.isdir(destination_name):
+        if os.path.isdir(destination_name) or os.path.isfile(destination_name):
             logging.error('Target folder %s already exist' % destination_name)
             return
 
