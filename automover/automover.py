@@ -124,13 +124,20 @@ class TVAutomover(Automover):
     name = 'tv'
 
     def get_interpolation_variables(self, name):
-        result = re.match(r'(?i)(?P<show>.+?)(?:\.|_?:)S0*(?P<season>\d+)E0*(?P<episode>\d+)(?:\.|_?:)', name)
+        matchers = [
+            r'(?i)(?P<show>.+?)[_.-]S(?P<season>\d+)[_.-]?E(?P<episode>\d+)[E_.-]',
+            r'(?i)(?P<show>.+?)[_.-](?P<season>\d+)x(?P<episode>\d+)[E_.-]',
+            r'(?i)(?P<show>.+?)[_.-](?P<season>20[01][0-9])[_.-](?P<episode>[01]?[0-9][_.-][0-3]?[0-9])[_.-]'
+        ]
 
-        if not result:
+        for m in matchers:
+            result = re.match(m, name)
+            if result:
+                break
+        else:
             return None
 
-        return {'show': result.group('show'), 'season': int(result.group('season')), 'episode': int(result.group('episode'))}
-
+        return {'show': result.group('show'), 'season': int(result.group('season')), 'episode': int(result.group('episode').replace('_', '').replace('.', '').replace('-', ''))}
 
 class MoviesAutomover(Automover):
     name = 'movies'
