@@ -2,6 +2,12 @@
 xmlrpc_url=http://username:password@localhost:5555/RPC2
 execute_on_moved=/bin/ls
 
+[remover]
+sometorrentsite=trac.ker.domain.example.com
+sometorrentsite_ratio=1.5
+someothertorrentsite=new.trac.ker.domain.example.com
+someothertorrentsite_ratio=2.5
+
 [tv]
 target_paths=/mnt/disk1/tv/,/mnt/disk2/tv/
 source_paths=/mnt/downloads/tv/

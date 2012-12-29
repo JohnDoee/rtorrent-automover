@@ -8,9 +8,9 @@ import sys
 import re
 import time
 import subprocess
+import shutil
 
 from xmlrpclib import ServerProxy
-from operator import itemgetter
 
 logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
@@ -113,7 +113,7 @@ class Automover(object):
         if is_started:
             self.stop_torrent(hash)
         self.proxy.d.set_directory(hash, destination)
-        os.rename(source, destination_name)
+        shutil.move(source, destination_name)
 
         if is_started:
             self.start_torrent(hash)
@@ -139,8 +139,43 @@ class TVAutomover(Automover):
 
         return {'show': result.group('show'), 'season': int(result.group('season')), 'episode': int(result.group('episode').replace('_', '').replace('.', '').replace('-', ''))}
 
+
 class MoviesAutomover(Automover):
     name = 'movies'
+
+
+def handle_remove(xmlrpc_url, remover_sites, target_paths):
+    proxy = ServerProxy(xmlrpc_url)
+    for f in proxy.download_list():
+        if not proxy.d.get_complete(f):
+            logging.debug('%s is not complete' % f)
+            continue
+        
+        directory = proxy.d.directory(f)
+        for target_path in target_paths:
+            if directory.startswith(target_path):
+                break
+        else:
+            logging.debug('%s is not moved yet' % f)
+            continue
+        
+        trackers = [proxy.t.get_url('%s:t%s' % (f, i)) for i in range(proxy.d.get_tracker_size(f))]
+        
+        moved = False
+        for tracker in trackers:
+            for site, (url, ratio) in remover_sites.items():
+                if url in tracker.lower():
+                    if ratio <= proxy.d.get_ratio(f) / 1000.0:
+                        logging.debug('Torrent %s was seeded %s and only %s is required, removing' % (f, proxy.d.get_ratio(f) / 1000.0, ratio))
+                        proxy.d.erase(f)
+                    break
+            else:
+                break
+        else:
+            moved = True
+        
+        if not moved:
+            logging.debug('%s is not on any known tracker' % f)
 
 
 def commandline_handler():
@@ -159,22 +194,42 @@ def commandline_handler():
 
     moved_something = False
     
+    all_destination_paths = []
     for klass in [TVAutomover, MoviesAutomover]:
         section = klass.name
         if not config.has_section(section):
             continue
 
         automove_syntax = config.has_option(section, 'automove_syntax') and config.get(section, 'automove_syntax') or None
+        target_paths = filter(lambda x:x, config.get(section, 'target_paths').split(','))
+        source_paths = filter(lambda x:x, config.get(section, 'source_paths').split(','))
+        
         automover = klass(xmlrpc_url,
-                            config.get(section, 'source_paths').split(','),
-                            config.get(section, 'target_paths').split(','),
+                            source_paths,
+                            target_paths,
                             automove_syntax)
         result = automover.scan()
         if not moved_something:
             moved_something = result
+        
+        all_destination_paths.extend(target_paths)
     
     if moved_something and config.has_option('general', 'execute_on_moved'):
         subprocess.call(config.get('general', 'execute_on_moved'), shell=True)
+    
+    if config.has_section('remover'):
+        remover_sites = {}
+        
+        for site in [x for x in config.options('remover') if not x.endswith('_ratio')]:
+            if not config.has_option('remover', '%s_ratio' % site):
+                logging.warn('Missing a ratio for site %s' % site)
+                continue
+            
+            remover_sites[site] = (config.get('remover', site).lower(), config.getfloat('remover', '%s_ratio' % site))
+        
+        if remover_sites:
+            logging.debug('Looking for torrents to remove')
+            handle_remove(xmlrpc_url, remover_sites, all_destination_paths)
 
 if __name__ == '__main__':
     commandline_handler()
