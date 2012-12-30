@@ -161,7 +161,7 @@ def handle_remove(xmlrpc_url, remover_sites, target_paths):
         
         trackers = [proxy.t.get_url('%s:t%s' % (f, i)) for i in range(proxy.d.get_tracker_size(f))]
         
-        moved = False
+        checked = False
         for tracker in trackers:
             for site, (url, ratio) in remover_sites.items():
                 if url in tracker.lower():
@@ -169,12 +169,11 @@ def handle_remove(xmlrpc_url, remover_sites, target_paths):
                         logging.debug('Torrent %s was seeded %s and only %s is required, removing' % (f, proxy.d.get_ratio(f) / 1000.0, ratio))
                         proxy.d.erase(f)
                     break
-            else:
+                    checked = True
+            if checked:
                 break
-        else:
-            moved = True
         
-        if not moved:
+        if not checked:
             logging.debug('%s is not on any known tracker' % f)
 
 
