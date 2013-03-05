@@ -1,4 +1,4 @@
-from automover.automover import Automover
+from automover.section import Automover
 
 class MoviesAutomover(Automover):
     """

@@ -8,7 +8,6 @@ import re
 import time
 import subprocess
 import shutil
-from automover.sections import SECTIONS
 
 
 class Automover(object):

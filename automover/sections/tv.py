@@ -1,6 +1,6 @@
 import re
 
-from automover.automover import Automover
+from automover.section import Automover
 
 class TVAutomover(Automover):
     """

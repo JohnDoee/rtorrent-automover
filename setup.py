@@ -9,7 +9,7 @@ setup(
     author='John Doee',
     maintainer='John Doee',
     url='https://github.com/johndoee/',
-    packages=['automover'],
+    packages=['automover', 'automover.clients', 'automover.sections'],
     license='BSD-new',
     entry_points={ 'console_scripts': [
         'automover = automover.cmd:commandline_handler',
