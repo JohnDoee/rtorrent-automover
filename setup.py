@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='rtorrent-automover',
-    version='0.3',
+    version='1.0',
     description='Automover ', 
     author='John Doee',
     maintainer='John Doee',
@@ -12,6 +12,6 @@ setup(
     packages=['automover'],
     license='BSD-new',
     entry_points={ 'console_scripts': [
-        'automover = automover.automover:commandline_handler',
+        'automover = automover.cmd:commandline_handler',
     ]},
 )

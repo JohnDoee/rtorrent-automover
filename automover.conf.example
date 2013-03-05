@@ -1,5 +1,4 @@
 [general]
-xmlrpc_url=http://username:password@localhost:5555/RPC2
 execute_on_moved=/bin/ls
 
 [remover]
@@ -7,12 +6,34 @@ sometorrentsite=trac.ker.domain.example.com
 sometorrentsite_ratio=1.5
 someothertorrentsite=new.trac.ker.domain.example.com
 someothertorrentsite_ratio=2.5
+thissite=crapker.example.com
+thissite_time=60
 
-[tv]
+[client_somertorrent]
+type=rtorrent
+xmlrpc_url=http://username:password@localhost:5555/RPC2
+
+[client_anotherrtorrent]
+type=rtorrent
+xmlrpc_url=http://username:password@localhost:5554/RPC2
+
+[section_tv]
+type=tv
 target_paths=/mnt/disk1/tv/,/mnt/disk2/tv/
 source_paths=/mnt/downloads/tv/
 automove_syntax=%(show)s/Season.%(season)0.2i/
 
-[movies]
+[section_movies]
+type=movies
+target_paths=/mnt/disk1/movies/,/mnt/disk2/movies/
+source_paths=/mnt/downloads/movies/
+
+[section_something]
+type=movies
+target_paths=/mnt/disk1/movies/,/mnt/disk2/movies/
+source_paths=/mnt/downloads/movies/
+
+[section_somethingelse]
+type=movies
 target_paths=/mnt/disk1/movies/,/mnt/disk2/movies/
 source_paths=/mnt/downloads/movies/
