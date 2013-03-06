@@ -34,12 +34,12 @@ class Torrent(object):
         self.name = os.path.split(path)[1]
     
     def move(self, destination):
-        self.client.stop(self)
-        
         destination_path = os.path.join(destination, self.name)
         if os.path.isfile(destination_path) or os.path.isdir(destination_path):
             self.logger.error('Unable to move %s because %s already exists', self.name, destination_path)
             return False
+        
+        self.client.stop(self)
         
         shutil.move(self.path, destination_path)
         self.client.set_path(destination)

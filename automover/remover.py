@@ -36,6 +36,3 @@ def handle_remove(client, remover_sites, target_paths, test_mode=False):
                         checked = True
             if checked:
                 break
-        
-        if not checked:
-            logging.debug('%s is not on any known tracker' % torrent)
