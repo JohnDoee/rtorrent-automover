@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 def commandline_handler():
     parser = argparse.ArgumentParser(description='Check for stuff to automove.')
     parser.add_argument("config", help="Path to config file", type=str)
+    parser.add_argument("--test", help="Run in test mode, don't actually do anything", action="store_true")
 
     args = parser.parse_args()
     if not os.path.isfile(args.config):
@@ -57,7 +58,7 @@ def commandline_handler():
                 continue
             
             config.remove_option(section, 'type')
-            clients[name] = klass(**dict(config.items(section)))
+            clients['_'.join(section.split('_')[1:])] = klass(**dict(config.items(section)))
             
         elif section.startswith('section_'):
             t = config.get(section, 'type')
@@ -86,14 +87,15 @@ def commandline_handler():
             klass = section['klass']    
             sec = klass(
                 section['source_paths'],
-                section['destination_paths'],
-                section['automove_syntax']
+                section['target_paths'],
+                section['automove_syntax'],
+                test_mode=args.test
             )
             sec.scan(client)
         
     if remover_sites:
         logger.debug('Looking for torrents to remove')
-        handle_remove(client, remover_sites, all_destination_paths)
+        handle_remove(client, remover_sites, all_destination_paths, test_mode=args.test)
 
 if __name__ == '__main__':
     commandline_handler()

@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 
 logger = logging.getLogger(__name__)
 
-def handle_remove(client, remover_sites, target_paths):
+def handle_remove(client, remover_sites, target_paths, test_mode=False):
     for torrent in client.list():
         if not torrent.is_complete:
             logging.debug('%s is not complete' % torrent)
@@ -16,8 +16,6 @@ def handle_remove(client, remover_sites, target_paths):
             logger.debug('%s is not moved yet' % f)
             continue
         
-        #trackers = [proxy.t.get_url('%s:t%s' % (f, i)) for i in range(proxy.d.get_tracker_size(f))]
-        #
         checked = False
         for tracker in torrent.trackers():
             for site, (t, url, limit) in remover_sites.items():
@@ -25,13 +23,15 @@ def handle_remove(client, remover_sites, target_paths):
                     if t == 'ratio':
                         if limit <= torrent.ratio:
                             logging.debug('Torrent %s was seeded %s and only %s is required, removing' % (f, torrent.ratio, limit))
-                            torrent.delete()
+                            if not test_mode:
+                                torrent.delete()
                         break
                         checked = True
                     elif t == 'time':
                         if datetime.now()-timedelta(hours=int(limit)) > torrent.finish_time:
                             logging.debug('Torrent %s was finished at %s' % (f, torrent.finish_time))
-                            torrent.delete()
+                            if not test_mode:
+                                torrent.delete()
                         break
                         checked = True
             if checked:

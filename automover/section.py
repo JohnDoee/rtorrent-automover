@@ -11,10 +11,11 @@ import shutil
 
 
 class Automover(object):
-    def __init__(self, source_paths, destination_paths, automove_syntax):
+    def __init__(self, source_paths, destination_paths, automove_syntax, test_mode=False):
         self.source_paths = source_paths
         self.destination_paths = destination_paths
         self.automove_syntax = automove_syntax
+        self.test_mode = test_mode
         
         self.logger = logging.getLogger(__name__)
 
@@ -63,7 +64,8 @@ class Automover(object):
                 os.makedirs(destination)
 
             self.logger.debug('Moving %s to %s' % (name, destination))
-            torrent.move(destination)
+            if not self.test_mode:
+                torrent.move(destination)
             moved_anything = True
         
         return moved_anything
