@@ -41,8 +41,8 @@ class Torrent(object):
         
         self.client.stop(self)
         
-        shutil.move(self.path, destination_path)
         self.client.set_path(self, destination)
+        shutil.move(self.path, destination_path)
         self.path = destination
         self.client.start(self)
         
