@@ -95,7 +95,7 @@ def commandline_handler():
             )
             moved_something = sec.scan(client) or moved_something
     
-    if not test_mode and moved_something and execute_on_moved:
+    if not args.test and moved_something and execute_on_moved:
         subprocess.call(execute_on_moved, shell=True)
     
     if remover_sites:

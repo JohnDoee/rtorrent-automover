@@ -51,7 +51,7 @@ class Automover(object):
                         i += 1
                     return i
                 
-                check_dirs = os.path.join(sorted(check_dirs, key=check_part_count, reverse=True)[0], target)
+                destination = os.path.join(sorted(check_dirs, key=check_part_count, reverse=True)[0], target)
             else:
                 destination = destination_paths[0]
             
