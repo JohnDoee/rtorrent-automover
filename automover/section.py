@@ -1,13 +1,7 @@
-#!/usr/bin/env python
-
-import argparse
 import os
-import ConfigParser
 import logging
-import re
-import time
-import subprocess
-import shutil
+
+from automover.utils import get_free_space
 
 
 class Automover(object):
@@ -22,7 +16,7 @@ class Automover(object):
     def scan(self, client):
         moved_anything = False
         
-        self.logger.debug('Scanning section: %s' % self.name)
+        self.logger.debug('Scanning section %s with client %s' % (self.name, client.name))
         for torrent in client.list():
             for source_path in self.source_paths:
                 if torrent.path.startswith(source_path):
@@ -31,8 +25,8 @@ class Automover(object):
             else:
                 continue
 
-            if not torrent.is_complete(f):
-                self.logger.debug('%s is not complete' % f)
+            if not torrent.is_complete:
+                self.logger.debug('%s is not complete' % torrent)
                 continue
 
             name = torrent.name
@@ -40,8 +34,8 @@ class Automover(object):
 
             destination_paths = [p for p in self.destination_paths if get_free_space(p) + 10*1024*1024 > size]
 
-            check_dirs = destination_paths # find best path in these
             if self.automove_syntax:
+                check_dirs = destination_paths # find best path in these
                 target = self.automove_syntax % self.get_interpolation_variables(name)
                 target_split = target.strip(os.sep).split(os.sep)
                 
@@ -57,8 +51,9 @@ class Automover(object):
                         i += 1
                     return i
                 
-                check_dirs = sorted(check_dirs, key=check_part_count, reverse=True)
-            destination = check_dirs[0]
+                check_dirs = os.path.join(sorted(check_dirs, key=check_part_count, reverse=True)[0], target)
+            else:
+                destination = destination_paths[0]
             
             if not os.path.isdir(destination):
                 os.makedirs(destination)

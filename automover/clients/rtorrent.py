@@ -57,7 +57,7 @@ class RTorrentClient(Client):
         return True
     
     def trackers(self, torrent):
-        return [self.proxy.t.get_url('%s:t%s' % (f, i)) for i in range(self.proxy.d.get_tracker_size(torrent.torrent_id))]
+        return [self.proxy.t.get_url('%s:t%s' % (torrent.torrent_id, i)) for i in range(self.proxy.d.get_tracker_size(torrent.torrent_id))]
     
     def _get_state(self, torrent):
         return self.proxy.d.state(torrent.torrent_id)

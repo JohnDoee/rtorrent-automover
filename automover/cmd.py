@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import argparse
 import logging
@@ -91,11 +93,16 @@ def commandline_handler():
                 section['automove_syntax'],
                 test_mode=args.test
             )
-            sec.scan(client)
-        
+            moved_something = sec.scan(client) or moved_something
+    
+    if not test_mode and moved_something and execute_on_moved:
+        subprocess.call(execute_on_moved, shell=True)
+    
     if remover_sites:
         logger.debug('Looking for torrents to remove')
         handle_remove(client, remover_sites, all_destination_paths, test_mode=args.test)
+    
+    
 
 if __name__ == '__main__':
     commandline_handler()

@@ -13,7 +13,7 @@ def handle_remove(client, remover_sites, target_paths, test_mode=False):
             if torrent.path.startswith(target_path):
                 break
         else:
-            logger.debug('%s is not moved yet' % f)
+            logger.debug('%s is not moved yet' % torrent)
             continue
         
         checked = False
@@ -22,14 +22,14 @@ def handle_remove(client, remover_sites, target_paths, test_mode=False):
                 if url in tracker.lower():
                     if t == 'ratio':
                         if limit <= torrent.ratio:
-                            logging.debug('Torrent %s was seeded %s and only %s is required, removing' % (f, torrent.ratio, limit))
+                            logging.debug('Torrent %s was seeded %s and only %s is required, removing' % (torrent, torrent.ratio, limit))
                             if not test_mode:
                                 torrent.delete()
                         break
                         checked = True
                     elif t == 'time':
                         if datetime.now()-timedelta(hours=int(limit)) > torrent.finish_time:
-                            logging.debug('Torrent %s was finished at %s' % (f, torrent.finish_time))
+                            logging.debug('Torrent %s was finished at %s' % (torrent, torrent.finish_time))
                             if not test_mode:
                                 torrent.delete()
                         break
@@ -38,4 +38,4 @@ def handle_remove(client, remover_sites, target_paths, test_mode=False):
                 break
         
         if not checked:
-            logging.debug('%s is not on any known tracker' % f)
+            logging.debug('%s is not on any known tracker' % torrent)
