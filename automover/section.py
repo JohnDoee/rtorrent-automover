@@ -33,6 +33,9 @@ class Automover(object):
             size = torrent.get_size()
 
             destination_paths = [p for p in self.destination_paths if get_free_space(p) + 10*1024*1024 > size]
+            if not destination_paths:
+                self.logger.debug('No free space for %s (need %s)' % (torrent, size))
+                continue
 
             if self.automove_syntax:
                 check_dirs = destination_paths # find best path in these
