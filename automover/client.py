@@ -33,6 +33,9 @@ class Torrent(object):
         
         self.name = os.path.split(path)[1]
     
+    def _move(self, path, destination_path):
+        shutil.move(self.path, destination_path)
+    
     def move(self, destination):
         destination_path = os.path.join(destination, self.name)
         if os.path.isfile(destination_path) or os.path.isdir(destination_path):
@@ -42,7 +45,7 @@ class Torrent(object):
         self.client.stop(self)
         
         self.client.set_path(self, destination)
-        shutil.move(self.path, destination_path)
+        self._move(self.path, destination_path)
         self.path = destination
         self.client.start(self)
         
