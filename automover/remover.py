@@ -5,21 +5,21 @@ logger = logging.getLogger(__name__)
 
 def handle_remove(client, remover_sites, target_paths, test_mode=False):
     for torrent in client.list():
-        if not torrent.is_complete:
-            logging.debug('%s is not complete' % torrent)
-            continue
-        
-        for target_path in target_paths:
-            if torrent.path.startswith(target_path):
-                break
-        else:
-            logger.debug('%s is not moved yet' % torrent)
-            continue
-        
         checked = False
         for tracker in torrent.trackers():
             for site, (t, url, limit) in remover_sites.items():
                 if url in tracker.lower():
+                    if not torrent.is_complete:
+                        logging.debug('%s is not complete' % torrent)
+                        break
+                    
+                    for target_path in target_paths:
+                        if torrent.path.startswith(target_path):
+                            break
+                    else:
+                        logger.debug('%s is not moved yet' % torrent)
+                        break
+                    
                     if t == 'ratio':
                         if limit <= torrent.ratio:
                             logging.debug('Torrent %s was seeded %s and only %s is required, removing' % (torrent, torrent.ratio, limit))
