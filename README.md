@@ -1,6 +1,8 @@
 rtorrent-automover
 ==================
 
+[![Build Status](https://travis-ci.org/JohnDoee/rtorrent-automover.png)](https://travis-ci.org/JohnDoee/rtorrent-automover)
+
 Moves complete torrents automagically for rtorrent.
 Can also cleanup when something is both moved and seeded enough.
 
@@ -10,13 +12,13 @@ Instructions
 How to get this ship sailing.
 First, rtorrent needs to download stuff to specific folders, as that's how we figure out where to move from.
 
-Second, XMLRPC needs to be configured, see the rutorrent project for instructions: http://code.google.com/p/rutorrent/wiki/Installation
+Second, XMLRPC needs to be configured, see the ruTorrent project for instructions: http://code.google.com/p/rutorrent/wiki/Installation
 
 
 ### Installation
     virtualenv automover
     cd automover
-    bin/pip install git+git://github.com/JohnDoee/rtorrent-automover.git
+    bin/pip install rtorrent-automover
 
 ### Configuration
 There is an example config file, modify it for your needs (https://github.com/JohnDoee/rtorrent-automover/blob/master/automover.conf.example).
