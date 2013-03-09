@@ -61,7 +61,7 @@ class Torrent(object):
         return get_size(self.path)
     
     def __repr__(self):
-        return "Torrent(%s, %s)" % (self.torrent_id, self.path)
+        return 'Torrent("%s", "%s")' % (self.torrent_id, self.path)
     
     
 
