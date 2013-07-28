@@ -6,6 +6,8 @@ import logging
 import subprocess
 import ConfigParser
 
+from tendo import singleton
+
 from automover.sections import SECTIONS
 from automover.clients import CLIENTS
 from automover.remover import handle_remove
@@ -21,6 +23,8 @@ def commandline_handler():
     if not os.path.isfile(args.config):
         print 'File not found: %s' % args.config
         quit()
+
+     me = singleton.SingleInstance()
 
     config = ConfigParser.RawConfigParser()
     config.read(args.config)
