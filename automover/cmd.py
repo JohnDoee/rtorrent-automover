@@ -24,7 +24,7 @@ def commandline_handler():
         print 'File not found: %s' % args.config
         quit()
 
-     me = singleton.SingleInstance()
+    me = singleton.SingleInstance()
 
     config = ConfigParser.RawConfigParser()
     config.read(args.config)
