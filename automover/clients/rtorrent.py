@@ -1,17 +1,35 @@
 from __future__ import division
 
+import httplib
 import os
 import time
+
 from datetime import datetime
-from xmlrpclib import ServerProxy
+from xmlrpclib import ServerProxy, Transport
 
 from automover.client import Client, Torrent
+
+TIMEOUT = 60*5
+
+class TimeoutTransport(Transport):
+    def make_connection(self, host):
+        #return an existing connection if possible.  This allows
+        #HTTP/1.1 keep-alive.
+        if self._connection and host == self._connection[0]:
+            return self._connection[1]
+
+        # create a HTTP connection object from a host descriptor
+        chost, self._extra_headers, x509 = self.get_host_info(host)
+        #store the host argument along with the connection object
+        self._connection = host, httplib.HTTPConnection(chost, timeout=TIMEOUT)
+        return self._connection[1]
+
 
 class RTorrentClient(Client):
     name = 'rtorrent'
     
     def __init__(self, xmlrpc_url):
-        self.proxy = ServerProxy(xmlrpc_url)
+        self.proxy = ServerProxy(xmlrpc_url, transport=TimeoutTransport())
     
     def list(self):
         torrents = []
