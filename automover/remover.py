@@ -9,12 +9,15 @@ def handle_remove(client, remover_sites, target_paths, test_mode=False):
             logging.debug('%s is not complete, skipping' % torrent)
             continue
         
-        for target_path in target_paths:
-            if torrent.path.startswith(target_path):
-                break
+        if target_paths:
+            for target_path in target_paths:
+                if torrent.path.startswith(target_path):
+                    break
+            else:
+                logger.debug('%s is not in any known path, skipping' % torrent)
+                continue
         else:
-            logger.debug('%s is not in any known path, skipping' % torrent)
-            continue
+            logger.debug('No known taget paths found, seems like we are in removal only mode')
         
         deleted = False
         for tracker in torrent.trackers():

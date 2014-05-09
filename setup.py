@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='rtorrent-automover',
-    version='2.2.2',
+    version='2.2.3',
     description='Automover ', 
     author='John Doee',
     maintainer='John Doee',

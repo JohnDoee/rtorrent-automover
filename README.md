@@ -14,6 +14,7 @@ First, rtorrent needs to download stuff to specific folders, as that's how we fi
 
 Second, XMLRPC needs to be configured, see the ruTorrent project for instructions: http://code.google.com/p/rutorrent/wiki/Installation
 
+If all you need is remove torrents after a given timeperiod or ratio limit, do not add any ```section_``` sections to the conf file.
 
 ### Installation
     virtualenv automover
