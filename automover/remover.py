@@ -21,7 +21,7 @@ def handle_remove(client, remover_sites, target_paths, test_mode=False):
         
         deleted = False
         for tracker in torrent.trackers():
-            for site, (t, url, limit) in remover_sites.items():
+            for site, t, url, limit in remover_sites:
                 if url in tracker.lower():
                     if t == 'ratio':
                         if limit <= torrent.ratio:

@@ -42,19 +42,20 @@ def commandline_handler():
         if section == 'general':
             execute_on_moved = config.has_option('general', 'execute_on_moved') and config.get('general', 'execute_on_moved') or None
         elif section == 'remover':
-            remover_sites = {}
+            remover_sites = []
         
             for site in [x for x in config.options(section) if not x.endswith('_ratio') and not x.endswith('_time')]:
+                found = False
                 if config.has_option(section, '%s_ratio' % site):
-                    t = 'ratio'
-                    remover_sites[site] = ('ratio', config.get(section, site).lower(), config.getfloat(section, '%s_ratio' % site))
-                elif config.has_option(section, '%s_time' % site):
-                    t = 'time'
-                else:
-                    logger.warn('Missing a ratio or time for site %s', site)
-                    continue
+                    remover_sites.append((site, 'ratio', config.get(section, site).lower(), config.getfloat(section, '%s_ratio' % site)))
+                    found = True
                 
-                remover_sites[site] = (t, config.get(section, site).lower(), config.getfloat(section, '%s_%s' % (site, t)))
+                if config.has_option(section, '%s_time' % site):
+                    remover_sites.append((site, 'time', config.get(section, site).lower(), config.getint(section, '%s_time' % site)))
+                    found = True
+                
+                if not found:
+                    logger.warn('Missing a ratio or time for site %s', site)
                 
         elif section.startswith('client_'):
             t = config.get(section, 'type')
