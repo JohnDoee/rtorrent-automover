@@ -27,56 +27,60 @@ class TimeoutTransport(Transport):
 
 class RTorrentClient(Client):
     name = 'rtorrent'
-    
+
     def __init__(self, xmlrpc_url):
         self.proxy = ServerProxy(xmlrpc_url, transport=TimeoutTransport())
-    
+
     def list(self):
         torrents = []
-        for torrent_hash in self.proxy.download_list():
-            finish_time = datetime.fromtimestamp(self.proxy.d.timestamp.finished(torrent_hash))
-            ratio = self.proxy.d.get_ratio(torrent_hash) / 1000
-            is_complete = self.proxy.d.get_complete(torrent_hash)
-            
-            path = self.proxy.d.directory(torrent_hash)
-            if not self.proxy.d.is_multi_file(torrent_hash):
-                path = os.path.join(path, self.proxy.d.name(torrent_hash))
-            
+        query = self.proxy.d.multicall(['main', 'd.get_hash=', 'd.name=', 'd.timestamp.finished=', 'd.get_ratio=', 'd.get_complete=', 'd.directory=', 'd.is_multi_file='])
+        for torrent_hash, name, finish_time, ratio, is_complete, path, is_multi_file in query:
+            finish_time = datetime.fromtimestamp(finish_time)
+            ratio = ratio / 1000
+
+            if not is_multi_file:
+                path = os.path.join(path, name)
+
             torrents.append(Torrent(self, torrent_hash, finish_time, ratio, path, is_complete))
-        
+
+        infohashes = [x[0] for x in query]
+        trackers = [x[0] for x in self.proxy.system.multicall([{'methodName': 't.multicall', 'params': [infohash, '', ['t.get_url=']]} for infohash in infohashes])]
+
+        for torrent, tracker in zip(torrents, trackers):
+            setattr(torrent, '_trackers', [x[0] for x in tracker])
+
         return torrents
-    
+
     def delete(self, torrent):
         self.proxy.d.erase(torrent.torrent_id)
         return True
-    
+
     def stop(self, torrent):
         self.proxy.d.stop(torrent.torrent_id)
-        
+
         i = 0
         while self._get_state(torrent) != 0 and i < 10:
             time.sleep(0.5)
             i += 1
-        
+
         return i != 10
-    
+
     def start(self, torrent):
         self.proxy.d.start(torrent.torrent_id)
-        
+
         i = 0
         while self._get_state(torrent) != 1 and i < 10:
             time.sleep(0.5)
             i += 1
-        
+
         return i != 10
-    
+
     def set_path(self, torrent, path):
         self.proxy.d.set_directory(torrent.torrent_id, path)
         return True
-    
+
     def trackers(self, torrent):
-        return [self.proxy.t.get_url('%s:t%s' % (torrent.torrent_id, i)) for i in range(self.proxy.d.get_tracker_size(torrent.torrent_id))]
-    
+        return torrent._trackers
+
     def _get_state(self, torrent):
         return self.proxy.d.state(torrent.torrent_id)
-    

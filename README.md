@@ -1,8 +1,6 @@
 rtorrent-automover
 ==================
 
-[![Build Status](https://travis-ci.org/JohnDoee/rtorrent-automover.png)](https://travis-ci.org/JohnDoee/rtorrent-automover)
-
 Moves complete torrents automagically for rtorrent.
 Can also cleanup when something is both moved and seeded enough.
 
